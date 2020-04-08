@@ -37,14 +37,14 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 )
 
-const appName = "GaiaApp"
+const appName = "BandConsumerApp"
 
 var (
-	// DefaultCLIHome default home directories for gaiacli
-	DefaultCLIHome = os.ExpandEnv("$HOME/.gaiacli")
+	// DefaultCLIHome default home directories for bccli
+	DefaultCLIHome = os.ExpandEnv("$HOME/.bccli")
 
-	// DefaultNodeHome default home directories for gaiad
-	DefaultNodeHome = os.ExpandEnv("$HOME/.gaiad")
+	// DefaultNodeHome default home directories for bcd
+	DefaultNodeHome = os.ExpandEnv("$HOME/.bcd")
 
 	// ModuleBasics The module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
@@ -81,10 +81,10 @@ var (
 )
 
 // Verify app interface at compile time
-var _ simapp.App = (*GaiaApp)(nil)
+var _ simapp.App = (*BandConsumerApp)(nil)
 
-// GaiaApp extended ABCI application
-type GaiaApp struct {
+// BandConsumerApp extended ABCI application
+type BandConsumerApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -120,12 +120,12 @@ type GaiaApp struct {
 	sm *module.SimulationManager
 }
 
-// NewGaiaApp returns a reference to an initialized GaiaApp.
-func NewGaiaApp(
+// NewBandConsumerApp returns a reference to an initialized BandConsumerApp.
+func NewBandConsumerApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, skipUpgradeHeights map[int64]bool, home string,
 	baseAppOptions ...func(*bam.BaseApp),
-) *GaiaApp {
+) *BandConsumerApp {
 
 	// TODO: Remove cdc in favor of appCodec once all modules are migrated.
 	cdc := codecstd.MakeCodec(ModuleBasics)
@@ -142,7 +142,7 @@ func NewGaiaApp(
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
-	app := &GaiaApp{
+	app := &BandConsumerApp{
 		BaseApp:        bApp,
 		cdc:            cdc,
 		invCheckPeriod: invCheckPeriod,
@@ -305,20 +305,20 @@ func NewGaiaApp(
 }
 
 // Name returns the name of the App
-func (app *GaiaApp) Name() string { return app.BaseApp.Name() }
+func (app *BandConsumerApp) Name() string { return app.BaseApp.Name() }
 
 // BeginBlocker application updates every begin block
-func (app *GaiaApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *BandConsumerApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker application updates every end block
-func (app *GaiaApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *BandConsumerApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // InitChainer application update at chain initialization
-func (app *GaiaApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *BandConsumerApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState simapp.GenesisState
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
 
@@ -333,12 +333,12 @@ func (app *GaiaApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 }
 
 // LoadHeight loads a particular height
-func (app *GaiaApp) LoadHeight(height int64) error {
+func (app *BandConsumerApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *GaiaApp) ModuleAccountAddrs() map[string]bool {
+func (app *BandConsumerApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -348,12 +348,12 @@ func (app *GaiaApp) ModuleAccountAddrs() map[string]bool {
 }
 
 // Codec returns the application's sealed codec.
-func (app *GaiaApp) Codec() *codec.Codec {
+func (app *BandConsumerApp) Codec() *codec.Codec {
 	return app.cdc
 }
 
 // SimulationManager implements the SimulationApp interface
-func (app *GaiaApp) SimulationManager() *module.SimulationManager {
+func (app *BandConsumerApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 

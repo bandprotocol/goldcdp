@@ -24,7 +24,7 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/cosmos/gaia/app"
+	"github.com/bandprotocol/band-consumer/app"
 )
 
 var (
@@ -52,8 +52,8 @@ func main() {
 	// with the cdc
 
 	rootCmd := &cobra.Command{
-		Use:   "gaiacli",
-		Short: "Command line interface for interacting with gaiad",
+		Use:   "bccli",
+		Short: "Command line interface for interacting with bcd",
 	}
 
 	// Add --chain-id to persistent flags and mark it required
@@ -77,8 +77,8 @@ func main() {
 		flags.NewCompletionCmd(rootCmd, true),
 	)
 
-	// Add flags and prefix all env exposed with GA
-	executor := cli.PrepareMainCmd(rootCmd, "GA", app.DefaultCLIHome)
+	// Add flags and prefix all env exposed with BC
+	executor := cli.PrepareMainCmd(rootCmd, "BC", app.DefaultCLIHome)
 
 	err := executor.Execute()
 	if err != nil {

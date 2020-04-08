@@ -5,7 +5,7 @@ VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
-TEST_DOCKER_REPO=jackzampolin/gaiatest
+# TEST_DOCKER_REPO=jackzampolin/gaiatest
 
 export GO111MODULE = on
 
@@ -48,9 +48,9 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaia \
-		  -X github.com/cosmos/cosmos-sdk/version.ServerName=gaiad \
-		  -X github.com/cosmos/cosmos-sdk/version.ClientName=gaiacli \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=band-consumer \
+		  -X github.com/cosmos/cosmos-sdk/version.ServerName=bcd \
+		  -X github.com/cosmos/cosmos-sdk/version.ClientName=bccli \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
@@ -74,11 +74,11 @@ all: install lint test
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
-	go build -mod=readonly $(BUILD_FLAGS) -o build/gaiad.exe ./cmd/gaiad
-	go build -mod=readonly $(BUILD_FLAGS) -o build/gaiacli.exe ./cmd/gaiacli
+	go build -mod=readonly $(BUILD_FLAGS) -o build/bcd.exe ./cmd/bcd
+	go build -mod=readonly $(BUILD_FLAGS) -o build/bccli.exe ./cmd/bccli
 else
-	go build -mod=readonly $(BUILD_FLAGS) -o build/gaiad ./cmd/gaiad
-	go build -mod=readonly $(BUILD_FLAGS) -o build/gaiacli ./cmd/gaiacli
+	go build -mod=readonly $(BUILD_FLAGS) -o build/bcd ./cmd/bcd
+	go build -mod=readonly $(BUILD_FLAGS) -o build/bccli ./cmd/bccli
 endif
 
 build-linux: go.sum
@@ -92,8 +92,8 @@ else
 endif
 
 install: go.sum
-	go install $(BUILD_FLAGS) ./cmd/gaiad
-	go install $(BUILD_FLAGS) ./cmd/gaiacli
+	go install $(BUILD_FLAGS) ./cmd/bcd
+	go install $(BUILD_FLAGS) ./cmd/bccli
 
 go-mod-cache: go.sum
 	@echo "--> Download go modules to local cache"
@@ -106,7 +106,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/gaiad -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/bcd -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
 	rm -rf snapcraft-local.yaml build/
@@ -161,13 +161,13 @@ test-build: build
 benchmark:
 	@go test -mod=readonly -bench=. ./...
 
-test-docker:
-	@docker build -f contrib/Dockerfile.test -t ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) .
-	@docker tag ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) ${TEST_DOCKER_REPO}:$(shell git rev-parse --abbrev-ref HEAD | sed 's#/#_#g')
-	@docker tag ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) ${TEST_DOCKER_REPO}:latest
-	@docker push ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD)
-	@docker push ${TEST_DOCKER_REPO}:$(shell git rev-parse --abbrev-ref HEAD | sed 's#/#_#g')
-	@docker push ${TEST_DOCKER_REPO}:latest
+# test-docker:
+# 	@docker build -f contrib/Dockerfile.test -t ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) .
+# 	@docker tag ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) ${TEST_DOCKER_REPO}:$(shell git rev-parse --abbrev-ref HEAD | sed 's#/#_#g')
+# 	@docker tag ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD) ${TEST_DOCKER_REPO}:latest
+# 	@docker push ${TEST_DOCKER_REPO}:$(shell git rev-parse --short HEAD)
+# 	@docker push ${TEST_DOCKER_REPO}:$(shell git rev-parse --abbrev-ref HEAD | sed 's#/#_#g')
+# 	@docker push ${TEST_DOCKER_REPO}:latest
 
 
 ###############################################################################
@@ -188,12 +188,12 @@ format:
 ###                                Localnet                                 ###
 ###############################################################################
 
-build-docker-gaiadnode:
+build-docker-bcdnode:
 	$(MAKE) -C networks/local
 
 # Run a 4-node testnet locally
 localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/gaiad/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/gaiad:Z tendermint/gaiadnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
+	@if ! [ -f build/node0/bcd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/bcd:Z tendermint/bcdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test ; fi
 	docker-compose up -d
 
 # Stop testnet
@@ -205,23 +205,23 @@ setup-contract-tests-data:
 	rm -rf /tmp/contract_tests ; \
 	mkdir /tmp/contract_tests ; \
 	cp "${GOPATH}/pkg/mod/${SDK_PACK}/client/lcd/swagger-ui/swagger.yaml" /tmp/contract_tests/swagger.yaml ; \
-	./build/gaiad init --home /tmp/contract_tests/.gaiad --chain-id lcd contract-tests ; \
+	./build/bcd init --home /tmp/contract_tests/.bcd --chain-id lcd contract-tests ; \
 	tar -xzf lcd_test/testdata/state.tar.gz -C /tmp/contract_tests/
 
-start-gaia: setup-contract-tests-data
-	./build/gaiad --home /tmp/contract_tests/.gaiad start &
+start-bc: setup-contract-tests-data
+	./build/bcd --home /tmp/contract_tests/.bcd start &
 	@sleep 2s
 
-setup-transactions: start-gaia
+setup-transactions: start-bc
 	@bash ./lcd_test/testdata/setup.sh
 
 run-lcd-contract-tests:
-	@echo "Running Gaia LCD for contract tests"
-	./build/gaiacli rest-server --laddr tcp://0.0.0.0:8080 --home /tmp/contract_tests/.gaiacli --node http://localhost:26657 --chain-id lcd --trust-node true
+	@echo "Running Band-Consumer LCD for contract tests"
+	./build/bccli rest-server --laddr tcp://0.0.0.0:8080 --home /tmp/contract_tests/.bccli --node http://localhost:26657 --chain-id lcd --trust-node true
 
 contract-tests: setup-transactions
-	@echo "Running Gaia LCD for contract tests"
-	dredd && pkill gaiad
+	@echo "Running Band-Consumer LCD for contract tests"
+	dredd && pkill bcd
 
 ###############################################################################
 ###                                Protobuf                                 ###
@@ -242,5 +242,5 @@ proto-check-breaking:
 
 .PHONY: all build-linux install install-debug \
 	go-mod-cache draw-deps clean build \
-	setup-transactions setup-contract-tests-data start-gaia run-lcd-contract-tests contract-tests \
+	setup-transactions setup-contract-tests-data start-bc run-lcd-contract-tests contract-tests \
 	test test-all test-build test-cover test-unit test-race

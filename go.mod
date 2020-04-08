@@ -1,4 +1,4 @@
-module github.com/cosmos/gaia
+module github.com/bandprotocol/band-consumer
 
 go 1.13
 

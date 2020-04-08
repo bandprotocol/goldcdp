@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/cosmos/gaia/app"
+	"github.com/bandprotocol/band-consumer/app"
 )
 
 // This will fail half the time with the second output being 173
