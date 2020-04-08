@@ -35,6 +35,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
+
+	"github.com/bandprotocol/band-consumer/x/consuming"
 )
 
 const appName = "BandConsumerApp"
@@ -65,18 +67,17 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		ibc.AppModuleBasic{},
-		transfer.AppModuleBasic{},
+		consuming.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		auth.FeeCollectorName:           nil,
-		distr.ModuleName:                nil,
-		mint.ModuleName:                 {supply.Minter},
-		staking.BondedPoolName:          {supply.Burner, supply.Staking},
-		staking.NotBondedPoolName:       {supply.Burner, supply.Staking},
-		gov.ModuleName:                  {supply.Burner},
-		transfer.GetModuleAccountName(): {supply.Minter, supply.Burner},
+		auth.FeeCollectorName:     nil,
+		distr.ModuleName:          nil,
+		mint.ModuleName:           {supply.Minter},
+		staking.BondedPoolName:    {supply.Burner, supply.Staking},
+		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		gov.ModuleName:            {supply.Burner},
 	}
 )
 
@@ -98,20 +99,20 @@ type BandConsumerApp struct {
 	subspaces map[string]params.Subspace
 
 	// keepers
-	accountKeeper  auth.AccountKeeper
-	bankKeeper     bank.Keeper
-	supplyKeeper   supply.Keeper
-	stakingKeeper  staking.Keeper
-	slashingKeeper slashing.Keeper
-	mintKeeper     mint.Keeper
-	distrKeeper    distr.Keeper
-	govKeeper      gov.Keeper
-	crisisKeeper   crisis.Keeper
-	paramsKeeper   params.Keeper
-	upgradeKeeper  upgrade.Keeper
-	evidenceKeeper evidence.Keeper
-	ibcKeeper      ibc.Keeper
-	transferKeeper transfer.Keeper
+	accountKeeper   auth.AccountKeeper
+	bankKeeper      bank.Keeper
+	supplyKeeper    supply.Keeper
+	stakingKeeper   staking.Keeper
+	slashingKeeper  slashing.Keeper
+	mintKeeper      mint.Keeper
+	distrKeeper     distr.Keeper
+	govKeeper       gov.Keeper
+	crisisKeeper    crisis.Keeper
+	paramsKeeper    params.Keeper
+	upgradeKeeper   upgrade.Keeper
+	evidenceKeeper  evidence.Keeper
+	ibcKeeper       ibc.Keeper
+	consumingKeeper consuming.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -138,7 +139,7 @@ func NewBandConsumerApp(
 		bam.MainStoreKey, auth.StoreKey, bank.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, ibc.StoreKey, transfer.StoreKey,
-		evidence.StoreKey, upgrade.StoreKey,
+		evidence.StoreKey, upgrade.StoreKey, consuming.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -217,18 +218,17 @@ func NewBandConsumerApp(
 		app.supplyKeeper, &stakingKeeper, govRouter,
 	)
 
+	// create IBC keeper
+	app.ibcKeeper = ibc.NewKeeper(app.cdc, keys[ibc.StoreKey], stakingKeeper)
+
+	app.consumingKeeper = consuming.NewKeeper(
+		appCodec, keys[consuming.StoreKey], app.ibcKeeper.ChannelKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
-	)
-
-	app.ibcKeeper = ibc.NewKeeper(app.cdc, keys[ibc.StoreKey], stakingKeeper)
-
-	transferCapKey := app.ibcKeeper.PortKeeper.BindPort(bank.ModuleName)
-	app.transferKeeper = transfer.NewKeeper(
-		app.cdc, keys[transfer.StoreKey], transferCapKey,
-		app.ibcKeeper.ChannelKeeper, app.bankKeeper, app.supplyKeeper,
 	)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
@@ -247,7 +247,7 @@ func NewBandConsumerApp(
 		upgrade.NewAppModule(app.upgradeKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
-		transfer.NewAppModule(app.transferKeeper),
+		consuming.NewAppModule(app.transferKeeper),
 	)
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
