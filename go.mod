@@ -7,7 +7,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200403165032-6c289546136c
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/bandprotocol/bandchain/chain v0.0.0-20200408084304-3a195a09153b
+	github.com/bandprotocol/bandchain/chain v0.0.0-20200409072710-fdf54a471528
 	github.com/otiai10/copy v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa

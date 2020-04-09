@@ -17,7 +17,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/bandprotocol/band-consumer/x/consuming/types"
-	"github.com/bandprotocol/bandchain/chain/x/zoracle"
+	"github.com/bandprotocol/bandchain/chain/x/oracle"
 )
 
 const (
@@ -71,7 +71,7 @@ $ %s tx consuming request 1 --calldata 1234abcdef --requested-validator-count 4 
 			if err != nil {
 				return err
 			}
-			oracleScriptID := zoracle.OracleScriptID(int64OracleScriptID)
+			oracleScriptID := oracle.OracleScriptID(int64OracleScriptID)
 
 			calldata, err := cmd.Flags().GetBytesHex(flagCalldata)
 			if err != nil {

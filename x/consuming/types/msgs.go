@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/bandprotocol/bandchain/chain/x/zoracle"
+	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -11,20 +11,20 @@ const RouterKey = ModuleName
 
 // MsgRequestData is a message for requesting a new data request to an existing oracle script.
 type MsgRequestData struct {
-	OracleScriptID           zoracle.OracleScriptID `json:"oracleScriptID"`
-	SourceChannel            string                 `json:"sourceChannel"`
-	Calldata                 []byte                 `json:"calldata"`
-	RequestedValidatorCount  int64                  `json:"requestedValidatorCount"`
-	SufficientValidatorCount int64                  `json:"sufficientValidatorCount"`
-	Expiration               int64                  `json:"expiration"`
-	PrepareGas               uint64                 `json:"prepareGas"`
-	ExecuteGas               uint64                 `json:"executeGas"`
-	Sender                   sdk.AccAddress         `json:"sender"`
+	OracleScriptID           oracle.OracleScriptID `json:"oracleScriptID"`
+	SourceChannel            string                `json:"sourceChannel"`
+	Calldata                 []byte                `json:"calldata"`
+	RequestedValidatorCount  int64                 `json:"requestedValidatorCount"`
+	SufficientValidatorCount int64                 `json:"sufficientValidatorCount"`
+	Expiration               int64                 `json:"expiration"`
+	PrepareGas               uint64                `json:"prepareGas"`
+	ExecuteGas               uint64                `json:"executeGas"`
+	Sender                   sdk.AccAddress        `json:"sender"`
 }
 
 // NewMsgRequestData creates a new MsgRequestData instance.
 func NewMsgRequestData(
-	oracleScriptID zoracle.OracleScriptID,
+	oracleScriptID oracle.OracleScriptID,
 	sourceChannel string,
 	calldata []byte,
 	requestedValidatorCount int64,

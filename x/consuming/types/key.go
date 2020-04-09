@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/binary"
 
-	"github.com/bandprotocol/bandchain/chain/x/zoracle"
+	"github.com/bandprotocol/bandchain/chain/x/oracle"
 )
 
 const (
@@ -19,7 +19,7 @@ var (
 )
 
 // ResultStoreKey is a function to generate key for each result in store
-func ResultStoreKey(requestID zoracle.RequestID) []byte {
+func ResultStoreKey(requestID oracle.RequestID) []byte {
 	return append(ResultStoreKeyPrefix, int64ToBytes(int64(requestID))...)
 }
 

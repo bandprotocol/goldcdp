@@ -5,7 +5,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// GenesisState is the zoracle state that must be provided at genesis.
+// GenesisState is the band-consumer state that must be provided at genesis.
 type GenesisState struct{}
 
 // NewGenesisState creates a new genesis state.

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/bandprotocol/bandchain/chain/x/zoracle"
+	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	"github.com/cosmos/cosmos-sdk/codec"
 	channel "github.com/cosmos/cosmos-sdk/x/ibc/04-channel"
 	commitmenttypes "github.com/cosmos/cosmos-sdk/x/ibc/23-commitment/types"
@@ -14,7 +14,7 @@ func init() {
 	RegisterCodec(ModuleCdc)
 	channel.RegisterCodec(ModuleCdc)
 	commitmenttypes.RegisterCodec(ModuleCdc)
-	zoracle.RegisterCodec(ModuleCdc)
+	oracle.RegisterCodec(ModuleCdc)
 }
 
 // RegisterCodec registers concrete types on the Amino codec.

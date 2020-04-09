@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bandprotocol/band-consumer/x/consuming/types"
-	"github.com/bandprotocol/bandchain/chain/x/zoracle"
+	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	channel "github.com/cosmos/cosmos-sdk/x/ibc/04-channel"
@@ -34,11 +34,11 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			if !found {
 				return nil, sdkerrors.Wrapf(
 					sdkerrors.ErrUnknownRequest,
-					"unknown sequence number for channel %s port zoracle",
+					"unknown sequence number for channel %s port oracle",
 					msg.SourceChannel,
 				)
 			}
-			packet := zoracle.NewOracleRequestPacketData(
+			packet := oracle.NewOracleRequestPacketData(
 				msg.OracleScriptID, hex.EncodeToString(msg.Calldata), msg.RequestedValidatorCount,
 				msg.SufficientValidatorCount, msg.Expiration, msg.PrepareGas,
 				msg.ExecuteGas,
@@ -52,7 +52,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			}
 			return &sdk.Result{Events: ctx.EventManager().Events().ToABCIEvents()}, nil
 		case channeltypes.MsgPacket:
-			var responseData zoracle.OracleResponsePacketData
+			var responseData oracle.OracleResponsePacketData
 			if err := types.ModuleCdc.UnmarshalJSON(msg.GetData(), &responseData); err == nil {
 				fmt.Println("I GOT DATA", responseData.Result)
 				return &sdk.Result{Events: ctx.EventManager().Events().ToABCIEvents()}, nil
