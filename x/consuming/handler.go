@@ -39,9 +39,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 				)
 			}
 			packet := oracle.NewOracleRequestPacketData(
-				msg.OracleScriptID, hex.EncodeToString(msg.Calldata), msg.RequestedValidatorCount,
-				msg.SufficientValidatorCount, msg.Expiration, msg.PrepareGas,
-				msg.ExecuteGas,
+				msg.ClientID, msg.OracleScriptID, hex.EncodeToString(msg.Calldata),
+				msg.AskCount, msg.MinCount,
 			)
 			err := keeper.ChannelKeeper.SendPacket(ctx, channel.NewPacket(packet.GetBytes(),
 				sequence, "consuming", msg.SourceChannel, destinationPort, destinationChannel,
@@ -54,7 +53,7 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		case channeltypes.MsgPacket:
 			var responseData oracle.OracleResponsePacketData
 			if err := types.ModuleCdc.UnmarshalJSON(msg.GetData(), &responseData); err == nil {
-				fmt.Println("I GOT DATA", responseData.Result)
+				fmt.Println("I GOT DATA", responseData.Result, responseData.ResolveTime)
 				return &sdk.Result{Events: ctx.EventManager().Events().ToABCIEvents()}, nil
 			}
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal oracle packet data")

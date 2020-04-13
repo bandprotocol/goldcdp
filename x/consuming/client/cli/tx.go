@@ -21,14 +21,12 @@ import (
 )
 
 const (
-	flagName                     = "name"
-	flagCalldata                 = "calldata"
-	flagRequestedValidatorCount  = "requested-validator-count"
-	flagSufficientValidatorCount = "sufficient-validator-count"
-	flagExpiration               = "expiration"
-	flagPrepareGas               = "prepare-gas"
-	flagExecuteGas               = "execute-gas"
-	flagChannel                  = "channel"
+	flagName     = "name"
+	flagCalldata = "calldata"
+	flagClientID = "client-id"
+	flagAskCount = "ask-count"
+	flagMinCount = "min-count"
+	flagChannel  = "channel"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -67,6 +65,11 @@ $ %s tx consuming request 1 --calldata 1234abcdef --requested-validator-count 4 
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(authclient.GetTxEncoder(cdc))
 
+			clientID, err := cmd.Flags().GetString(flagClientID)
+			if err != nil {
+				return err
+			}
+
 			int64OracleScriptID, err := strconv.ParseInt(args[0], 10, 64)
 			if err != nil {
 				return err
@@ -78,27 +81,12 @@ $ %s tx consuming request 1 --calldata 1234abcdef --requested-validator-count 4 
 				return err
 			}
 
-			requestedValidatorCount, err := cmd.Flags().GetInt64(flagRequestedValidatorCount)
+			askCount, err := cmd.Flags().GetInt64(flagAskCount)
 			if err != nil {
 				return err
 			}
 
-			sufficientValidatorCount, err := cmd.Flags().GetInt64(flagSufficientValidatorCount)
-			if err != nil {
-				return err
-			}
-
-			expiration, err := cmd.Flags().GetInt64(flagExpiration)
-			if err != nil {
-				return err
-			}
-
-			prepareGas, err := cmd.Flags().GetUint64(flagPrepareGas)
-			if err != nil {
-				return err
-			}
-
-			executionGas, err := cmd.Flags().GetUint64(flagExecuteGas)
+			minCount, err := cmd.Flags().GetInt64(flagMinCount)
 			if err != nil {
 				return err
 			}
@@ -111,12 +99,10 @@ $ %s tx consuming request 1 --calldata 1234abcdef --requested-validator-count 4 
 			msg := types.NewMsgRequestData(
 				oracleScriptID,
 				channel,
+				clientID,
 				calldata,
-				requestedValidatorCount,
-				sufficientValidatorCount,
-				expiration,
-				prepareGas,
-				executionGas,
+				askCount,
+				minCount,
 				cliCtx.GetFromAddress(),
 			)
 
@@ -129,17 +115,12 @@ $ %s tx consuming request 1 --calldata 1234abcdef --requested-validator-count 4 
 		},
 	}
 
+	cmd.Flags().String(flagClientID, "", "The client id of request")
 	cmd.Flags().BytesHexP(flagCalldata, "c", nil, "Calldata used in calling the oracle script")
-	cmd.Flags().Int64P(flagRequestedValidatorCount, "r", 0, "Number of top validators that need to report data for this request")
-	cmd.MarkFlagRequired(flagRequestedValidatorCount)
-	cmd.Flags().Int64P(flagSufficientValidatorCount, "v", 0, "Minimum number of reports sufficient to conclude the request's result")
-	cmd.MarkFlagRequired(flagSufficientValidatorCount)
-	cmd.Flags().Int64P(flagExpiration, "x", 0, "Maximum block count before the data request is considered expired")
-	cmd.MarkFlagRequired(flagExpiration)
-	cmd.Flags().Uint64P(flagPrepareGas, "w", 0, "The amount of gas that will be reserved for prepare function")
-	cmd.MarkFlagRequired(flagPrepareGas)
-	cmd.Flags().Uint64P(flagExecuteGas, "g", 0, "The amount of gas that will be reserved for later execution")
-	cmd.MarkFlagRequired(flagExecuteGas)
+	cmd.Flags().Int64P(flagAskCount, "r", 0, "Number of top validators that need to report data for this request")
+	cmd.MarkFlagRequired(flagAskCount)
+	cmd.Flags().Int64P(flagMinCount, "v", 0, "Minimum number of reports sufficient to conclude the request's result")
+	cmd.MarkFlagRequired(flagMinCount)
 	cmd.Flags().String(flagChannel, "", "The channel id.")
 	cmd.MarkFlagRequired(flagChannel)
 
