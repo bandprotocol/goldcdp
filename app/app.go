@@ -67,17 +67,19 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		ibc.AppModuleBasic{},
+		transfer.AppModuleBasic{},
 		consuming.AppModuleBasic{},
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		auth.FeeCollectorName:     nil,
-		distr.ModuleName:          nil,
-		mint.ModuleName:           {supply.Minter},
-		staking.BondedPoolName:    {supply.Burner, supply.Staking},
-		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
-		gov.ModuleName:            {supply.Burner},
+		auth.FeeCollectorName:           nil,
+		distr.ModuleName:                nil,
+		mint.ModuleName:                 {supply.Minter},
+		staking.BondedPoolName:          {supply.Burner, supply.Staking},
+		staking.NotBondedPoolName:       {supply.Burner, supply.Staking},
+		gov.ModuleName:                  {supply.Burner},
+		transfer.GetModuleAccountName(): {supply.Minter, supply.Burner},
 	}
 )
 
@@ -112,6 +114,7 @@ type BandConsumerApp struct {
 	upgradeKeeper   upgrade.Keeper
 	evidenceKeeper  evidence.Keeper
 	ibcKeeper       ibc.Keeper
+	transferKeeper  transfer.Keeper
 	consumingKeeper consuming.Keeper
 
 	// the module manager
@@ -221,6 +224,10 @@ func NewBandConsumerApp(
 	// create IBC keeper
 	app.ibcKeeper = ibc.NewKeeper(app.cdc, keys[ibc.StoreKey], stakingKeeper)
 
+	transferCapKey := app.ibcKeeper.PortKeeper.BindPort(bank.ModuleName)
+	app.transferKeeper = transfer.NewKeeper(app.cdc, keys[transfer.StoreKey], transferCapKey,
+		app.ibcKeeper.ChannelKeeper, app.bankKeeper, app.supplyKeeper)
+
 	app.consumingKeeper = consuming.NewKeeper(
 		appCodec, keys[consuming.StoreKey], app.ibcKeeper.ChannelKeeper,
 	)
@@ -247,7 +254,8 @@ func NewBandConsumerApp(
 		upgrade.NewAppModule(app.upgradeKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
-		consuming.NewAppModule(app.transferKeeper),
+		transfer.NewAppModule(app.transferKeeper),
+		consuming.NewAppModule(app.consumingKeeper),
 	)
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
