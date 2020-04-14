@@ -3,7 +3,7 @@ rm -rf ~/.relayer
 
 rly config init
 
-# Add config
+# Add config after these commands can check your config file at `~/.relayer/config/config.yaml`
 rly chains add -f gaia.json
 rly chains add -f bandchain.json
 rly chains add -f goldchain.json
