@@ -1,0 +1,10 @@
+{
+  "key": "band-chain",
+  "chain-id": "bandchain",
+  "rpc-addr": "http://d3n-debug.bandprotocol.com:26657",
+  "account-prefix": "band",
+  "gas": 1000000,
+  "gas-prices": "0.025uband",
+  "default-denom": "uband",
+  "trusting-period": "330h"
+}
