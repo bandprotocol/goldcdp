@@ -18,6 +18,7 @@ var (
 )
 
 type (
-	Keeper         = keeper.Keeper
-	MsgRequestData = types.MsgRequestData
+	Keeper              = keeper.Keeper
+	MsgBuyGold          = types.MsgBuyGold
+	MsgSetSourceChannel = types.MsgSetSourceChannel
 )

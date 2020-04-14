@@ -3,7 +3,8 @@ package types
 import (
 	"encoding/binary"
 
-	"github.com/bandprotocol/bandchain/chain/x/oracle"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto"
 )
 
 const (
@@ -14,17 +15,37 @@ const (
 )
 
 var (
-	// ResultStoreKeyPrefix is a prefix for storing result
-	ResultStoreKeyPrefix = []byte{0xff}
+	// GlobalStoreKeyPrefix is a prefix for global primitive state variable
+	GlobalStoreKeyPrefix = []byte{0x00}
+
+	// OrdersCountStoreKey is a key that help getting to current orders count state variable
+	OrdersCountStoreKey = append(GlobalStoreKeyPrefix, []byte("OrdersCount")...)
+
+	// ChannelStoreKeyPrefix is a prefix for storing channel
+	ChannelStoreKeyPrefix = []byte{0x01}
+
+	// OrderStoreKeyPrefix is a prefix for storing order
+	OrderStoreKeyPrefix = []byte{0x02}
 )
 
-// ResultStoreKey is a function to generate key for each result in store
-func ResultStoreKey(requestID oracle.RequestID) []byte {
-	return append(ResultStoreKeyPrefix, int64ToBytes(int64(requestID))...)
+// ChannelStoreKey is a function to generate key for each verified channel in store
+func ChannelStoreKey(chainName, channelPort string) []byte {
+	buf := append(ChannelStoreKeyPrefix, []byte(chainName)...)
+	buf = append(buf, []byte(channelPort)...)
+	return buf
 }
 
-func int64ToBytes(num int64) []byte {
+// OrderStoreKey is a function to generate key for each order in store
+func OrderStoreKey(orderID uint64) []byte {
+	return append(OrderStoreKeyPrefix, uint64ToBytes(orderID)...)
+}
+
+func uint64ToBytes(num uint64) []byte {
 	result := make([]byte, 8)
-	binary.BigEndian.PutUint64(result, uint64(num))
+	binary.BigEndian.PutUint64(result, num)
 	return result
+}
+
+func GetEscrowAddress() sdk.AccAddress {
+	return sdk.AccAddress(crypto.AddressHash([]byte("COLLATERAL")))
 }

@@ -229,7 +229,7 @@ func NewBandConsumerApp(
 		app.ibcKeeper.ChannelKeeper, app.bankKeeper, app.supplyKeeper)
 
 	app.consumingKeeper = consuming.NewKeeper(
-		appCodec, keys[consuming.StoreKey], app.ibcKeeper.ChannelKeeper,
+		cdc, keys[consuming.StoreKey], app.bankKeeper, app.ibcKeeper.ChannelKeeper,
 	)
 
 	// register the staking hooks

@@ -1,45 +1,49 @@
 package keeper
 
 import (
-	"github.com/bandprotocol/bandchain/chain/x/oracle"
+	"encoding/binary"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/bandprotocol/band-consumer/x/consuming/types"
 )
 
 type Keeper struct {
 	storeKey      sdk.StoreKey
-	cdc           codec.Marshaler
+	cdc           *codec.Codec
+	BankKeeper    types.BankKeeper
 	ChannelKeeper types.ChannelKeeper
 }
 
 // NewKeeper creates a new band consumer Keeper instance.
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, channelKeeper types.ChannelKeeper) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, bankKeeper types.BankKeeper,
+	channelKeeper types.ChannelKeeper,
+) Keeper {
 	return Keeper{
 		storeKey:      key,
 		cdc:           cdc,
+		BankKeeper:    bankKeeper,
 		ChannelKeeper: channelKeeper,
 	}
 }
 
-func (k Keeper) SetResult(ctx sdk.Context, requestID oracle.RequestID, result []byte) {
+// GetOrderCount returns the current number of all orders ever exist.
+func (k Keeper) GetOrderCount(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.ResultStoreKey(requestID), result)
-}
-
-func (k Keeper) GetResult(ctx sdk.Context, requestID oracle.RequestID) ([]byte, error) {
-	if !k.HasResult(ctx, requestID) {
-		return nil, sdkerrors.Wrapf(types.ErrItemNotFound,
-			"GetResult: Result for request ID %d is not available.", requestID,
-		)
+	bz := store.Get(types.OrdersCountStoreKey)
+	if bz == nil {
+		return 0
 	}
-	store := ctx.KVStore(k.storeKey)
-	return store.Get(types.ResultStoreKey(requestID)), nil
+	return binary.BigEndian.Uint64(bz)
 }
 
-func (k Keeper) HasResult(ctx sdk.Context, requestID oracle.RequestID) bool {
+// GetNextOrderCount increments and returns the current number of orders.
+// If the global order count is not set, it initializes it with value 0.
+func (k Keeper) GetNextOrderCount(ctx sdk.Context) uint64 {
+	orderCount := k.GetOrderCount(ctx)
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.ResultStoreKey(requestID))
+	bz := sdk.Uint64ToBigEndian(orderCount + 1)
+	store.Set(types.OrdersCountStoreKey, bz)
+	return orderCount + 1
 }

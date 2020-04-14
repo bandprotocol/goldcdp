@@ -1,83 +1,97 @@
 package types
 
 import (
-	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// RouterKey is they name of the bank module
+// RouterKey is they name of the consuming module
 const RouterKey = ModuleName
 
-// MsgRequestData is a message for requesting a new data request to an existing oracle script.
-type MsgRequestData struct {
-	OracleScriptID oracle.OracleScriptID `json:"oracleScriptID"`
-	SourceChannel  string                `json:"sourceChannel"`
-	ClientID       string                `json:"clientID"`
-	Calldata       []byte                `json:"calldata"`
-	AskCount       int64                 `json:"askCount"`
-	MinCount       int64                 `json:"minCount"`
-	Sender         sdk.AccAddress        `json:"sender"`
+// MsgSetSoruceChannel is a message for setting source channel to other chain
+type MsgSetSourceChannel struct {
+	ChainName     string         `json:"chain_name"`
+	SourcePort    string         `json:"source_port"`
+	SourceChannel string         `json:"source_channel"`
+	Signer        sdk.AccAddress `json:"signer"`
 }
 
-// NewMsgRequestData creates a new MsgRequestData instance.
-func NewMsgRequestData(
-	oracleScriptID oracle.OracleScriptID,
-	sourceChannel string,
-	clientID string,
-	calldata []byte,
-	askCount int64,
-	minCount int64,
-	sender sdk.AccAddress,
-) MsgRequestData {
-	return MsgRequestData{
-		OracleScriptID: oracleScriptID,
-		SourceChannel:  sourceChannel,
-		Calldata:       calldata,
-		AskCount:       askCount,
-		MinCount:       minCount,
-		ClientID:       clientID,
-		Sender:         sender,
+func NewMsgSetSourceChannel(
+	chainName, sourcePort, sourceChannel string,
+	signer sdk.AccAddress,
+) MsgSetSourceChannel {
+	return MsgSetSourceChannel{
+		ChainName:     chainName,
+		SourcePort:    sourcePort,
+		SourceChannel: sourceChannel,
+		Signer:        signer,
 	}
 }
 
-// Route implements the sdk.Msg interface for MsgRequestData.
-func (msg MsgRequestData) Route() string { return RouterKey }
+// Route implements the sdk.Msg interface for MsgSetSourceChannel.
+func (msg MsgSetSourceChannel) Route() string { return RouterKey }
 
-// Type implements the sdk.Msg interface for MsgRequestData.
-func (msg MsgRequestData) Type() string { return "consuming" }
+// Type implements the sdk.Msg interface for MsgSetSourceChannel.
+func (msg MsgSetSourceChannel) Type() string { return "set_source_channel" }
 
-// ValidateBasic implements the sdk.Msg interface for MsgRequestData.
-func (msg MsgRequestData) ValidateBasic() error {
-	if msg.Sender.Empty() {
-		return sdkerrors.Wrapf(ErrInvalidBasicMsg, "MsgRequestData: Sender address must not be empty.")
+// ValidateBasic implements the sdk.Msg interface for MsgSetSourceChannel.
+func (msg MsgSetSourceChannel) ValidateBasic() error {
+	// TODO: Add validate basic
+	return nil
+}
+
+// GetSigners implements the sdk.Msg interface for MsgSetSourceChannel.
+func (msg MsgSetSourceChannel) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Signer}
+}
+
+// GetSignBytes implements the sdk.Msg interface for MsgSetSourceChannel.
+func (msg MsgSetSourceChannel) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+// MsgBuyGold is a message for creating order to buy gold
+type MsgBuyGold struct {
+	Buyer  sdk.AccAddress `json:"buyer"`
+	Amount sdk.Coins      `json:"amount"`
+}
+
+// NewMsgBuyGold creates a new MsgBuyGold instance.
+func NewMsgBuyGold(
+	buyer sdk.AccAddress,
+	amount sdk.Coins,
+) MsgBuyGold {
+	return MsgBuyGold{
+		Buyer:  buyer,
+		Amount: amount,
 	}
-	if msg.OracleScriptID <= 0 {
-		return sdkerrors.Wrapf(ErrInvalidBasicMsg, "MsgRequestData: Oracle script id (%d) must be positive.", msg.OracleScriptID)
+}
+
+// Route implements the sdk.Msg interface for MsgBuyGold.
+func (msg MsgBuyGold) Route() string { return RouterKey }
+
+// Type implements the sdk.Msg interface for MsgBuyGold.
+func (msg MsgBuyGold) Type() string { return "buy_gold" }
+
+// ValidateBasic implements the sdk.Msg interface for MsgBuyGold.
+func (msg MsgBuyGold) ValidateBasic() error {
+	if msg.Buyer.Empty() {
+		return sdkerrors.Wrapf(ErrInvalidBasicMsg, "MsgBuyGold: Sender address must not be empty.")
 	}
-	if msg.AskCount <= 0 {
-		return sdkerrors.Wrapf(ErrInvalidBasicMsg,
-			"MsgRequestData: Ask validator count (%d) must be positive.",
-			msg.AskCount,
-		)
-	}
-	if msg.AskCount < msg.MinCount {
-		return sdkerrors.Wrapf(ErrInvalidBasicMsg,
-			"MsgRequestData: Request validator count (%d) must not be less than minimum validator count (%d).",
-			msg.AskCount,
-			msg.MinCount,
-		)
+	if msg.Amount.Empty() {
+		return sdkerrors.Wrapf(ErrInvalidBasicMsg, "MsgBuyGold: Amount must not be empty.")
 	}
 	return nil
 }
 
-// GetSigners implements the sdk.Msg interface for MsgRequestData.
-func (msg MsgRequestData) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+// GetSigners implements the sdk.Msg interface for MsgBuyGold.
+func (msg MsgBuyGold) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Buyer}
 }
 
-// GetSignBytes implements the sdk.Msg interface for MsgRequestData.
-func (msg MsgRequestData) GetSignBytes() []byte {
+// GetSignBytes implements the sdk.Msg interface for MsgBuyGold.
+func (msg MsgBuyGold) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
