@@ -7,12 +7,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
 	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	channel "github.com/cosmos/cosmos-sdk/x/ibc/04-channel"
 	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/04-channel/types"
+
+	"github.com/bandprotocol/goldcdp/x/goldcdp/types"
 )
 
 // NewHandler creates the msg handler of this module, as required by Cosmos-SDK standard.

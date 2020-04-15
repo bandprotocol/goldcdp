@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
+	"github.com/bandprotocol/goldcdp/x/goldcdp/types"
 )
 
 type Keeper struct {

@@ -1,8 +1,8 @@
 package goldcdp
 
 import (
-	"github.com/bandprotocol/band-consumer/x/goldcdp/keeper"
-	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
+	"github.com/bandprotocol/goldcdp/x/goldcdp/keeper"
+	"github.com/bandprotocol/goldcdp/x/goldcdp/types"
 )
 
 const (

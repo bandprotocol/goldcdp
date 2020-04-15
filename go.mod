@@ -1,4 +1,4 @@
-module github.com/bandprotocol/band-consumer
+module github.com/bandprotocol/goldcdp
 
 go 1.13
 

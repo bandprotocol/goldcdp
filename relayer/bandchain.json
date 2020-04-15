@@ -1,6 +1,6 @@
 {
   "key": "band-chain",
-  "chain-id": "bandchain",
+  "chain-id": "ibc-bandchain",
   "rpc-addr": "http://54.169.14.201:26657",
   "account-prefix": "band",
   "gas": 1000000,

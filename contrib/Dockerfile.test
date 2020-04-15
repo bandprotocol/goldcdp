@@ -8,7 +8,7 @@ FROM golang:1.14-alpine AS build-env
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python
 
 # Set working directory for the build
-WORKDIR /go/src/github.com/bandprotocol/band-consumer
+WORKDIR /go/src/github.com/bandprotocol/goldcdp
 
 # Add source files
 COPY . .

@@ -15,7 +15,7 @@ import (
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/spf13/cobra"
 
-	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
+	"github.com/bandprotocol/goldcdp/x/goldcdp/types"
 )
 
 // GetTxCmd returns the transaction commands for this module

@@ -36,7 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 
-	"github.com/bandprotocol/band-consumer/x/goldcdp"
+	"github.com/bandprotocol/goldcdp/x/goldcdp"
 )
 
 const appName = "BandConsumerApp"
