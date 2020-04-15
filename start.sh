@@ -17,3 +17,6 @@ bccli config trust-node true
 
 bcd gentx --name validator --keyring-backend test
 bcd collect-gentxs
+
+# Run chain
+bcd start --rpc.laddr=tcp://0.0.0.0:26657 --pruning=nothing
