@@ -5,7 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// RouterKey is they name of the consuming module
+// RouterKey is they name of the goldcdp module
 const RouterKey = ModuleName
 
 // MsgSetSoruceChannel is a message for setting source channel to other chain

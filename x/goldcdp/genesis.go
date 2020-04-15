@@ -1,4 +1,4 @@
-package consuming
+package goldcdp
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"

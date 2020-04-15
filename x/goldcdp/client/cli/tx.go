@@ -15,24 +15,24 @@ import (
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/spf13/cobra"
 
-	"github.com/bandprotocol/band-consumer/x/consuming/types"
+	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
 )
 
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	consumingCmd := &cobra.Command{
+	goldcdpCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "consuming transaction subcommands",
+		Short:                      "goldcdp transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	consumingCmd.AddCommand(flags.PostCommands(
+	goldcdpCmd.AddCommand(flags.PostCommands(
 		GetCmdRequest(cdc),
 		GetCmdSetChannel(cdc),
 	)...)
 
-	return consumingCmd
+	return goldcdpCmd
 }
 
 // GetCmdRequest implements the request command handler.
@@ -44,7 +44,7 @@ func GetCmdRequest(cdc *codec.Codec) *cobra.Command {
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Make a new order to buy gold.
 Example:
-$ %s tx consuming buy 1000000dfsbsdfdf/transfer/uatom
+$ %s tx goldcdp buy 1000000dfsbsdfdf/transfer/uatom
 `,
 				version.ClientName,
 			),
@@ -84,7 +84,7 @@ func GetCmdSetChannel(cdc *codec.Codec) *cobra.Command {
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Register a verified channel.
 Example:
-$ %s tx consuming set-cahnnel bandchain consuming dbdfgsdfsd
+$ %s tx goldcdp set-cahnnel bandchain goldcdp dbdfgsdfsd
 `,
 				version.ClientName,
 			),

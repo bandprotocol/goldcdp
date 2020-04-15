@@ -1,4 +1,4 @@
-package consuming
+package goldcdp
 
 import (
 	"encoding/binary"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bandprotocol/band-consumer/x/consuming/types"
+	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
 	"github.com/bandprotocol/bandchain/chain/x/oracle"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -43,7 +43,7 @@ func handleBuyGold(ctx sdk.Context, msg MsgBuyGold, keeper Keeper) (*sdk.Result,
 	}
 	// TODO: Set all bandchain parameter here
 	bandChainID := "bandchain"
-	port := "consuming"
+	port := "goldcdp"
 	oracleScriptID := oracle.OracleScriptID(3)
 	calldata := make([]byte, 8)
 	binary.LittleEndian.PutUint64(calldata, 1000000)
@@ -62,7 +62,7 @@ func handleBuyGold(ctx sdk.Context, msg MsgBuyGold, keeper Keeper) (*sdk.Result,
 	if !found {
 		return nil, sdkerrors.Wrapf(
 			sdkerrors.ErrUnknownRequest,
-			"unknown channel %s port consuming",
+			"unknown channel %s port goldcdp",
 			channelID,
 		)
 	}

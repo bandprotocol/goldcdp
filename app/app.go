@@ -36,7 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 
-	"github.com/bandprotocol/band-consumer/x/consuming"
+	"github.com/bandprotocol/band-consumer/x/goldcdp"
 )
 
 const appName = "BandConsumerApp"
@@ -68,7 +68,7 @@ var (
 		evidence.AppModuleBasic{},
 		ibc.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		consuming.AppModuleBasic{},
+		goldcdp.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -101,21 +101,21 @@ type BandConsumerApp struct {
 	subspaces map[string]params.Subspace
 
 	// keepers
-	accountKeeper   auth.AccountKeeper
-	bankKeeper      bank.Keeper
-	supplyKeeper    supply.Keeper
-	stakingKeeper   staking.Keeper
-	slashingKeeper  slashing.Keeper
-	mintKeeper      mint.Keeper
-	distrKeeper     distr.Keeper
-	govKeeper       gov.Keeper
-	crisisKeeper    crisis.Keeper
-	paramsKeeper    params.Keeper
-	upgradeKeeper   upgrade.Keeper
-	evidenceKeeper  evidence.Keeper
-	ibcKeeper       ibc.Keeper
-	transferKeeper  transfer.Keeper
-	consumingKeeper consuming.Keeper
+	accountKeeper  auth.AccountKeeper
+	bankKeeper     bank.Keeper
+	supplyKeeper   supply.Keeper
+	stakingKeeper  staking.Keeper
+	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
+	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
+	crisisKeeper   crisis.Keeper
+	paramsKeeper   params.Keeper
+	upgradeKeeper  upgrade.Keeper
+	evidenceKeeper evidence.Keeper
+	ibcKeeper      ibc.Keeper
+	transferKeeper transfer.Keeper
+	goldcdpKeeper  goldcdp.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -142,7 +142,7 @@ func NewBandConsumerApp(
 		bam.MainStoreKey, auth.StoreKey, bank.StoreKey, staking.StoreKey,
 		supply.StoreKey, mint.StoreKey, distr.StoreKey, slashing.StoreKey,
 		gov.StoreKey, params.StoreKey, ibc.StoreKey, transfer.StoreKey,
-		evidence.StoreKey, upgrade.StoreKey, consuming.StoreKey,
+		evidence.StoreKey, upgrade.StoreKey, goldcdp.StoreKey,
 	)
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -228,8 +228,8 @@ func NewBandConsumerApp(
 	app.transferKeeper = transfer.NewKeeper(app.cdc, keys[transfer.StoreKey], transferCapKey,
 		app.ibcKeeper.ChannelKeeper, app.bankKeeper, app.supplyKeeper)
 
-	app.consumingKeeper = consuming.NewKeeper(
-		cdc, keys[consuming.StoreKey], app.bankKeeper, app.ibcKeeper.ChannelKeeper,
+	app.goldcdpKeeper = goldcdp.NewKeeper(
+		cdc, keys[goldcdp.StoreKey], app.bankKeeper, app.ibcKeeper.ChannelKeeper,
 	)
 
 	// register the staking hooks
@@ -255,7 +255,7 @@ func NewBandConsumerApp(
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		transfer.NewAppModule(app.transferKeeper),
-		consuming.NewAppModule(app.consumingKeeper),
+		goldcdp.NewAppModule(app.goldcdpKeeper),
 	)
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the

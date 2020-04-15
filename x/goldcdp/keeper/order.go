@@ -7,7 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	transfer "github.com/cosmos/cosmos-sdk/x/ibc/20-transfer"
 
-	"github.com/bandprotocol/band-consumer/x/consuming/types"
+	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
 )
 
 func (k Keeper) AddOrder(ctx sdk.Context, buyer sdk.AccAddress, amount sdk.Coins) (uint64, error) {

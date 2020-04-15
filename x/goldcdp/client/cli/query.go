@@ -9,23 +9,23 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"
 
-	"github.com/bandprotocol/band-consumer/x/consuming/types"
+	"github.com/bandprotocol/band-consumer/x/goldcdp/types"
 )
 
 // GetQueryCmd returns
 func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
-	consumingCmd := &cobra.Command{
+	goldcdpCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Querying commands for the consuming module",
+		Short:                      "Querying commands for the goldcdp module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	consumingCmd.AddCommand(flags.GetCommands(
+	goldcdpCmd.AddCommand(flags.GetCommands(
 		GetCmdReadOrder(storeKey, cdc),
 	)...)
 
-	return consumingCmd
+	return goldcdpCmd
 }
 
 // GetCmdReadOrder queries order by orderID
