@@ -1,7 +1,7 @@
 {
   "key": "consumer",
   "chain-id": "band-consumer",
-  "rpc-addr": "<your_chain_endpoint",
+  "rpc-addr": "http://localhost:26657,
   "account-prefix": "cosmos",
   "gas": 1000000,
   "gas-prices": "0.025stake",
